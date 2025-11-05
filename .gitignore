@@ -1,0 +1,15 @@
+# Terraform files
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Credentials
+*.json
+credentials/
+
+# OS files
+.DS_Store
+
+# IDE
+.idea/
