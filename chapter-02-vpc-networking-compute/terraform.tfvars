@@ -1,7 +1,7 @@
 # Terraform Variables Configuration
 # Update the project_id with your actual GCP project ID
 
-project_id = "YOUR-PROJECT-ID"  # Replace with your GCP project ID
+project_id = "cl-demo-sandboxterraform"  # Use the project ID from Chapter 1 (with random suffix)
 region     = "europe-north2"
 zone       = "europe-north2-a"
 
