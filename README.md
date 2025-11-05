@@ -71,20 +71,65 @@ terraform apply
 
 ---
 
-### 🌐 Networking (Coming Soon)
+### 🌐 Networking & Compute
 
-#### Chapter 2: VPC and Subnets
-> **Learn**: Virtual Private Cloud setup, subnet creation, routing
+#### [Chapter 2: VPC, Networking, and Compute Instance](./chapter-02-vpc-networking-compute/)
+> **Learn**: Custom VPC setup, subnets, firewall rules, compute instances, SSH access
 
-#### Chapter 3: Firewall Rules and Security
-> **Learn**: Network security, firewall configuration, security best practices
+**What's Inside:**
+- 🌐 Custom VPC network creation (no auto-subnets)
+- 🗺️ Subnet configuration with specific CIDR ranges
+- 🔥 Firewall rules for SSH and ICMP
+- 💻 Compute instance deployment with nginx
+- 🔑 SSH key management for secure access
+- 🏷️ Network tags for firewall targeting
+- 📊 VPC flow logs for network monitoring
 
-#### Chapter 4: Load Balancers
+**Key Files:**
+- `main.tf` - VPC, subnet, firewall, and VM definitions
+- `provider.tf` - Google Cloud provider configuration
+- `variables.tf` - Input variables for customization
+- `outputs.tf` - Network and VM information outputs
+- `terraform.tfvars` - Configuration values with SSH key
+
+**Architecture:**
+- VPC: `cl-vpc-sandbox`
+- Subnet: `cl-sub-sandbox-web-eu-nrth2-01` (10.100.1.0/24)
+- VM: `cl-vm-sandbox-web-01` (e2-micro with nginx)
+- Firewall: SSH (22) and ICMP allowed
+
+**Quick Start:**
+```bash
+cd chapter-02-vpc-networking-compute
+terraform init
+terraform plan
+terraform apply
+# SSH into VM
+ssh rahulwagh@$(terraform output -raw vm_external_ip)
+```
+
+[📚 Full Chapter Documentation →](./chapter-02-vpc-networking-compute/README.md)
+
+---
+
+### 🔐 Security (Coming Soon)
+
+#### Chapter 3: Firewall Rules and Advanced Security
+> **Learn**: Advanced firewall rules, Cloud Armor, IAP tunneling
+
+#### Chapter 4: IAM and Service Accounts
+> **Learn**: Identity management, service accounts, roles, and permissions
+
+---
+
+### ⚖️ Load Balancing (Coming Soon)
+
+#### Chapter 5: HTTP(S) Load Balancers
 > **Learn**: HTTP(S) Load Balancing, SSL certificates, backend services
 
 ---
 
-### 💻 Compute (Coming Soon)
+### 💻 Compute Advanced (Coming Soon)
 
 #### Chapter 5: Compute Engine Instances
 > **Learn**: VM creation, instance templates, metadata
@@ -264,15 +309,15 @@ If you find this course helpful, please consider:
 ## 🗺️ Roadmap
 
 - [x] Chapter 1: GCP Project Creation
-- [ ] Chapter 2: VPC and Networking
-- [ ] Chapter 3: Compute Engine
-- [ ] Chapter 4: Google Kubernetes Engine
-- [ ] Chapter 5: Cloud Storage
-- [ ] Chapter 6: Cloud SQL
-- [ ] Chapter 7: Cloud Functions
-- [ ] Chapter 8: Cloud Run
-- [ ] Chapter 9: Load Balancers
-- [ ] Chapter 10: IAM and Security
+- [x] Chapter 2: VPC, Networking, and Compute Instance
+- [ ] Chapter 3: Advanced Firewall Rules and Security
+- [ ] Chapter 4: IAM and Service Accounts
+- [ ] Chapter 5: Load Balancers
+- [ ] Chapter 6: Google Kubernetes Engine
+- [ ] Chapter 7: Cloud Storage
+- [ ] Chapter 8: Cloud SQL
+- [ ] Chapter 9: Cloud Functions
+- [ ] Chapter 10: Cloud Run
 - [ ] More chapters coming soon...
 
 ---
