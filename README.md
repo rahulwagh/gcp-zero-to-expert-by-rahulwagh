@@ -112,10 +112,51 @@ ssh rahulwagh@$(terraform output -raw vm_external_ip)
 
 ---
 
-### 🔐 Security (Coming Soon)
+### 🔐 Security & Access Control
 
-#### Chapter 3: Firewall Rules and Advanced Security
-> **Learn**: Advanced firewall rules, Cloud Armor, IAP tunneling
+#### [Chapter 3: Bastion Host / Jump Server for Private VMs](./chapter-03-bastion-jump-host/)
+> **Learn**: Bastion host setup, private subnets, secure access to private VMs, SSH ProxyJump
+
+**What's Inside:**
+- 🔐 Bastion host / jump server deployment with public access
+- 🔒 Private subnet creation without internet access
+- 💻 Private VM deployment (no external IP)
+- 🔥 Firewall rules for bastion-to-private-VM access
+- 🚀 SSH ProxyJump configuration for seamless connections
+- 🛡️ Security best practices for jump hosts
+- 🌐 Private Google Access for VMs without external IPs
+
+**Key Files:**
+- `main.tf` - Private subnet, bastion host, private VM, and firewall rules
+- `provider.tf` - Google Cloud provider configuration
+- `variables.tf` - Input variables for customization
+- `outputs.tf` - Connection instructions and network information
+- `terraform.tfvars` - Configuration values with SSH key
+
+**Architecture:**
+- VPC: `cl-vpc-sandbox` (from Chapter 2)
+- Private Subnet: `cl-sub-sandbox-private-eu-nrth2-01` (10.100.2.0/24)
+- Bastion Host: `cl-vm-sandbox-bastion-01` (e2-micro with public IP)
+- Private VM: `cl-vm-sandbox-private-db-01` (e2-micro, no external IP)
+- Firewall: Bastion SSH from internet, Private VM SSH from bastion only
+
+**Quick Start:**
+```bash
+cd chapter-03-bastion-jump-host
+terraform init
+terraform plan
+terraform apply
+# Connect to bastion
+ssh rahulwagh@$(terraform output -raw bastion_external_ip)
+# Connect to private VM via ProxyJump
+ssh -J rahulwagh@$(terraform output -raw bastion_external_ip) rahulwagh@$(terraform output -raw private_vm_internal_ip)
+```
+
+[📚 Full Chapter Documentation →](./chapter-03-bastion-jump-host/README.md)
+
+---
+
+### 🔐 Security Advanced (Coming Soon)
 
 #### Chapter 4: IAM and Service Accounts
 > **Learn**: Identity management, service accounts, roles, and permissions
@@ -310,7 +351,7 @@ If you find this course helpful, please consider:
 
 - [x] Chapter 1: GCP Project Creation
 - [x] Chapter 2: VPC, Networking, and Compute Instance
-- [ ] Chapter 3: Advanced Firewall Rules and Security
+- [x] Chapter 3: Bastion Host / Jump Server for Private VMs
 - [ ] Chapter 4: IAM and Service Accounts
 - [ ] Chapter 5: Load Balancers
 - [ ] Chapter 6: Google Kubernetes Engine
