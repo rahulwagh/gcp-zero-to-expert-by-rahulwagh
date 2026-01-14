@@ -156,29 +156,92 @@ ssh -J rahulwagh@$(terraform output -raw bastion_external_ip) rahulwagh@$(terraf
 
 ---
 
-### 🔐 Security Advanced (Coming Soon)
+### 🌐 Advanced Networking
 
-#### Chapter 4: IAM and Service Accounts
-> **Learn**: Identity management, service accounts, roles, and permissions
+#### [Chapter 4: Cloud NAT Gateway](./chapter-04-nat-gateway/)
+> **Learn**: Configure Cloud NAT for private VM internet access, Cloud Router setup
+
+**What's Inside:**
+- 🌐 Cloud Router configuration with BGP settings
+- 🔐 Cloud NAT gateway for private VMs
+- 🚀 Enable internet access for VMs without external IPs
+- 📊 NAT traffic logging and monitoring
+- 🛡️ Secure outbound connectivity patterns
+- ⚙️ Port allocation and timeout configuration
+
+**Key Files:**
+- `main.tf` - Cloud Router and NAT gateway configuration
+- `provider.tf` - Google Cloud provider configuration
+- `variables.tf` - Input variables for customization
+- `outputs.tf` - Connection instructions and details
+- `terraform.tfvars` - Configuration values
+
+**Architecture:**
+- VPC: `cl-vpc-sandbox` (from Chapter 2)
+- Cloud Router: `cl-router-sandbox-eu-nrth2-01`
+- Cloud NAT: `cl-nat-sandbox-eu-nrth2-01`
+- NAT IP Allocation: AUTO_ONLY (Google managed)
+- Enables internet access for private VMs from Chapter 3
+
+**Quick Start:**
+```bash
+cd chapter-04-nat-gateway
+terraform init
+terraform plan
+terraform apply
+# Test from private VM via bastion
+```
+
+[📚 Full Chapter Documentation →](./chapter-04-nat-gateway/README.md)
 
 ---
 
-### ⚖️ Load Balancing (Coming Soon)
+### ⚖️ Load Balancing
 
-#### Chapter 5: HTTP(S) Load Balancers
-> **Learn**: HTTP(S) Load Balancing, SSL certificates, backend services
+#### [Chapter 5: External HTTP(S) Load Balancer](./chapter-05-external-load-balancer/)
+> **Learn**: Set up global HTTP load balancer with auto-healing and high availability
+
+**What's Inside:**
+- ⚖️ External HTTP(S) Load Balancer (global)
+- 🔄 Managed Instance Groups with auto-healing
+- 💻 Instance Templates for uniform VM creation
+- ❤️ Health checks and monitoring
+- 🌍 Global traffic distribution
+- 🔧 Auto-scaling capabilities
+- 📊 Backend service configuration
+
+**Key Files:**
+- `main.tf` - Load balancer components (forwarding rule, backend service, instance group)
+- `provider.tf` - Google Cloud provider configuration
+- `variables.tf` - Input variables for customization
+- `outputs.tf` - Load balancer IP and testing instructions
+- `terraform.tfvars` - Configuration values
+
+**Architecture:**
+- VPC: `cl-vpc-sandbox` (from Chapter 2)
+- Instance Template: `cl-template-sandbox-web-lb`
+- Managed Instance Group: 2 instances with auto-healing
+- Health Check: HTTP on port 80 (/health endpoint)
+- Backend Service: UTILIZATION-based load balancing
+- Global Forwarding Rule: External IP with HTTP proxy
+
+**Quick Start:**
+```bash
+cd chapter-05-external-load-balancer
+terraform init
+terraform plan
+terraform apply
+# Wait 5-10 minutes for full deployment
+# Access: http://<LOAD_BALANCER_IP>
+```
+
+[📚 Full Chapter Documentation →](./chapter-05-external-load-balancer/README.md)
 
 ---
 
-### 💻 Compute Advanced (Coming Soon)
+### 💻 Compute & Containers (Coming Soon)
 
-#### Chapter 5: Compute Engine Instances
-> **Learn**: VM creation, instance templates, metadata
-
-#### Chapter 6: Managed Instance Groups
-> **Learn**: Auto-scaling, health checks, rolling updates
-
-#### Chapter 7: Google Kubernetes Engine (GKE)
+#### Chapter 6: Google Kubernetes Engine (GKE)
 > **Learn**: GKE cluster creation, node pools, workload deployment
 
 ---
@@ -352,13 +415,14 @@ If you find this course helpful, please consider:
 - [x] Chapter 1: GCP Project Creation
 - [x] Chapter 2: VPC, Networking, and Compute Instance
 - [x] Chapter 3: Bastion Host / Jump Server for Private VMs
-- [ ] Chapter 4: IAM and Service Accounts
-- [ ] Chapter 5: Load Balancers
-- [ ] Chapter 6: Google Kubernetes Engine
-- [ ] Chapter 7: Cloud Storage
-- [ ] Chapter 8: Cloud SQL
-- [ ] Chapter 9: Cloud Functions
-- [ ] Chapter 10: Cloud Run
+- [x] Chapter 4: Cloud NAT Gateway
+- [x] Chapter 5: External HTTP(S) Load Balancer
+- [ ] Chapter 6: IAM and Service Accounts
+- [ ] Chapter 7: Google Kubernetes Engine (GKE)
+- [ ] Chapter 8: Cloud Storage
+- [ ] Chapter 9: Cloud SQL
+- [ ] Chapter 10: Cloud Functions
+- [ ] Chapter 11: Cloud Run
 - [ ] More chapters coming soon...
 
 ---
