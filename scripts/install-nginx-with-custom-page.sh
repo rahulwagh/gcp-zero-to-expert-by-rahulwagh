@@ -21,7 +21,7 @@
 # Repository: gcp-zero-to-expert-by-rahulwagh
 # ============================================================================
 
-set -e
+# Note: Removed 'set -e' to handle errors more gracefully
 
 # ============================================================================
 # Configuration Variables (Customize these as needed)
@@ -40,27 +40,26 @@ log() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
 }
 
-# Function to wait for apt lock to be released
+# Function to wait for apt lock to be released (improved version)
 wait_for_apt() {
-    log "Checking for apt locks..."
-    local max_attempts=60  # 5 minutes maximum wait
-    local attempt=0
+    log "Waiting for apt to be available..."
+    local max_wait=300  # 5 minutes maximum wait
+    local elapsed=0
 
-    while [ $attempt -lt $max_attempts ]; do
-        if ! sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 && \
-           ! sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1 && \
-           ! sudo fuser /var/lib/apt/lists/lock >/dev/null 2>&1; then
-            log "Apt lock released, continuing..."
+    while [ $elapsed -lt $max_wait ]; do
+        # Try to acquire the lock by running apt-get check
+        if DEBIAN_FRONTEND=noninteractive apt-get check >/dev/null 2>&1; then
+            log "Apt is now available"
             return 0
         fi
 
-        log "Waiting for other apt processes to finish (attempt $((attempt + 1))/$max_attempts)..."
-        sleep 5
-        ((attempt++))
+        log "Apt is busy, waiting... ($elapsed/$max_wait seconds)"
+        sleep 10
+        elapsed=$((elapsed + 10))
     done
 
-    log "WARNING: Timed out waiting for apt lock, attempting to continue..."
-    return 1
+    log "WARNING: Timed out waiting for apt, attempting to continue anyway..."
+    return 0  # Continue anyway
 }
 
 # Function to get instance metadata
@@ -78,18 +77,54 @@ log "Starting nginx installation script..."
 
 # Wait for cloud-init to complete
 log "Waiting for cloud-init to complete..."
-cloud-init status --wait 2>/dev/null || log "Cloud-init not available or already completed"
+if command -v cloud-init >/dev/null 2>&1; then
+    cloud-init status --wait 2>/dev/null || log "Cloud-init wait completed or not applicable"
+else
+    log "Cloud-init not available, skipping..."
+fi
 
-# Wait for apt lock
+# Wait for apt to be available
 wait_for_apt
 
-# Update package list
-log "Updating package list..."
-apt-get update -qq
+# Kill any hanging apt processes (if running as root)
+if [ "$(id -u)" -eq 0 ]; then
+    log "Checking for stale apt processes..."
+    killall -q apt apt-get dpkg 2>/dev/null || true
+    sleep 2
+fi
 
-# Install nginx
+# Wait again after killing processes
+sleep 5
+
+# Update package list with retries
+log "Updating package list..."
+for i in {1..3}; do
+    log "Attempt $i to update package list..."
+    if DEBIAN_FRONTEND=noninteractive apt-get update -qq 2>/dev/null; then
+        log "Package list updated successfully"
+        break
+    fi
+    log "Update failed, waiting 10 seconds before retry..."
+    sleep 10
+done
+
+# Install nginx with retries
 log "Installing nginx..."
-DEBIAN_FRONTEND=noninteractive apt-get install -y -qq nginx
+for i in {1..3}; do
+    log "Attempt $i to install nginx..."
+    if DEBIAN_FRONTEND=noninteractive apt-get install -y -qq nginx 2>/dev/null; then
+        log "Nginx installed successfully"
+        break
+    fi
+    log "Installation failed, waiting 10 seconds before retry..."
+    sleep 10
+done
+
+# Verify nginx was installed
+if ! command -v nginx >/dev/null 2>&1; then
+    log "ERROR: Nginx installation failed after multiple attempts"
+    exit 1
+fi
 
 # Get instance details from metadata server
 log "Fetching instance metadata..."
@@ -282,6 +317,7 @@ if systemctl is-active --quiet nginx; then
     log "✓ Nginx is running successfully!"
 else
     log "✗ ERROR: Nginx failed to start!"
+    systemctl status nginx
     exit 1
 fi
 
@@ -293,3 +329,5 @@ log "Access the server at: http://$INSTANCE_IP"
 log "Health check endpoint: http://$INSTANCE_IP/health"
 log "Info endpoint: http://$INSTANCE_IP/info.txt"
 log "============================================"
+
+exit 0
